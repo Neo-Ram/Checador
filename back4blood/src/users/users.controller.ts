@@ -22,4 +22,17 @@ export class UsersController {
         }
         return this.userService.createuser(email, password, role);
     }
+
+
+    @Post('login')
+    async validateUser(
+        @Body('email') email: string,
+        @Body('password') password: string
+    ){
+        if (!email || !password ) {
+            throw new Error('Los campos "email" y "password"" son obligatorios');
+        }
+
+        return this.userService.validateUser(email, password);
+    }
 }
