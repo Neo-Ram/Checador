@@ -15,5 +15,16 @@ export class UsersService {
         return snapshot.docs.map(doc=> ({ id: doc.id, ...doc.data() }));
     }
 
+    async createuser(email: string, password: string,role: string){ {
+    // Guardar solo los campos necesarios
+    const newUser = {
+      email: email,
+      password: password,
+      role: role
+    };
 
+    const docRef = await this.firestore.collection(this.collection).add(newUser);
+    return { id: docRef.id, ...newUser };
+  }
+}
 }
