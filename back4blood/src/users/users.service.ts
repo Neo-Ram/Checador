@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { FirebaseService } from '../firebase/firebase.service';
 import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UsersService {
@@ -8,7 +9,9 @@ export class UsersService {
     private firestore;
     private readonly saltRounds = 10;
 
-    constructor(private readonly firebaseService: FirebaseService){
+    constructor(private readonly firebaseService: FirebaseService,
+      private jwtService: JwtService
+    ){
         this.firestore = firebaseService.getFirestore();
     }
 //Obtener a todos los usuarios y listo
@@ -67,7 +70,12 @@ async validateUser(email: string, password: string) {
   //Originalmente no iba pero para validar la contraseña
   const isPasswordValid = await bcrypt.compare(password, hashedPassword);
   if (isPasswordValid) {
-      return {success: true, message: 'Login exitoso'}; 
+
+
+    const payload = { id: userDoc.id, role: userDoc.get('role') };
+
+    // Devolver el token en un objeto
+    return { access_token: this.jwtService.sign(payload) };
   }
   else{
       return {success: false, message: 'Contraseña incorrecta'};
